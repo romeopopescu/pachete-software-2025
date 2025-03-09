@@ -1,4 +1,4 @@
-# Data Preprocessing and Machine Learning: A Streamlit Guide
+# Data preprocessing and machine learning: a streamlit guide
 
 ## Introduction
 
