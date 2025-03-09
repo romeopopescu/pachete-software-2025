@@ -41,7 +41,7 @@ The datasets used in this project are **publicly available** and can be download
 First, clone this repository to your local machine:
 
 ```sh
-git https://github.com/alingabriel743/software-packages-2025/tree/main
+git clone https://github.com/alingabriel743/software-packages-2025/tree/main
 cd software-packages-2025/Sem3_StreamlitP1
 
 ```
