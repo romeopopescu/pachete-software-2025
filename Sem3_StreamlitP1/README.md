@@ -70,7 +70,7 @@ Once the virtual environment is activated, install the required Python libraries
 pip install -r requirements.txt
 ```
 
-### ** Run the Streamlit application**
+### **Run the Streamlit application**
 
 ```sh
 streamlit run Intro.py
