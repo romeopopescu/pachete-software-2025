@@ -8,7 +8,7 @@ from scipy.stats import zscore
 
 st.title("Encoding categorical variables & handling outliers")
 
-df = pd.read_csv("data/titanic.csv")
+df = pd.read_csv("../data/titanic.csv")
 
 st.markdown("""
 ### Understanding categorical variables

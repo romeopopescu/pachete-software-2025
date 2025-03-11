@@ -15,7 +15,7 @@ This section covers:
 - standardization and normalization techniques.
 """)
 
-df = pd.read_csv("data/titanic.csv")
+df = pd.read_csv("../data/titanic.csv")
 
 numeric_cols = df.select_dtypes(include=["number"]).columns
 categorical_cols = df.select_dtypes(include=["object"]).columns
