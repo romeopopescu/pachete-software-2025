@@ -33,7 +33,7 @@ choice = st.radio("Pick one", ["Yes", "No"])
 """, language="python")
 
 option = st.selectbox("Choose an option", ["Option A", "Option B", "Option C"])
-choice = st.radio("Pick one", ["Yes", "No"])
+choice = st.radio("Pick one", ["Yes", "No", "Maybe"])
 
 st.write(f"You chose: {option}, {choice}")
 
@@ -73,7 +73,7 @@ st.subheader("Slider")
 slider_value = st.slider("Select a value", 0, 100)
 st.write(f"Slider value: {slider_value}")
 
-range_slider = st.slider("Select a range", 0, 100, (20, 80))
+range_slider = st.slider("Select a range", 0, 100, (10, 200))
 st.write(f"Range selected: {range_slider}")
 
 st.subheader("Date and time input")
