@@ -11,33 +11,26 @@ from sklearn.model_selection import train_test_split
 from sklearn.metrics import accuracy_score
 import statsmodels.api as sm
 import warnings
-warnings.filterwarnings('ignore')
 
-# Set page config
 st.set_page_config(page_title="NVIDIA Sales Analysis", layout="wide")
 
-# Title
 st.title("NVIDIA Sales Data Analysis")
 st.write("Analysis of NVIDIA's sales performance across different product categories, regions, and customer segments")
 
 @st.cache_data
 def load_data():
     """Load and return the NVIDIA sales data"""
-    # Economic interpretation: Loading sales data to understand NVIDIA's market performance and revenue distribution
     df = pd.read_csv('nvidia_simplified_last_5_years_sorted.csv')
     df['Date'] = pd.to_datetime(df['Date'])
     return df
 
-# Load data
 df = load_data()
 
-# Display basic info
 st.header("1. Data Overview")
 st.write("**Economic interpretation**: Understanding the structure and scope of NVIDIA's sales data helps identify key business metrics and market coverage")
 st.write(f"Dataset contains {len(df)} sales records from {df['Date'].min().date()} to {df['Date'].max().date()}")
 st.dataframe(df.head())
 
-# Basic statistics
 st.subheader("Basic Statistics")
 st.write("**Economic interpretation**: Statistical summary reveals revenue distribution patterns, sales volume ranges, and market share variations across NVIDIA's business")
 st.write(df.describe())
@@ -47,7 +40,6 @@ st.header("2. Data Quality Analysis")
 
 def check_missing_values(df):
     """Check for missing values in the dataset"""
-    # Economic interpretation: Missing data can indicate incomplete sales records or data collection issues that may affect revenue analysis accuracy
     missing = df.isnull().sum()
     st.write("Missing values per column:")
     st.write(missing)
@@ -55,7 +47,6 @@ def check_missing_values(df):
 
 def handle_extreme_values(df):
     """Identify and handle extreme values in revenue and units sold"""
-    # Economic interpretation: Extreme values may represent large enterprise deals or data errors that could skew market analysis and forecasting
     Q1_revenue = df['Sales Revenue (USD)'].quantile(0.25)
     Q3_revenue = df['Sales Revenue (USD)'].quantile(0.75)
     IQR_revenue = Q3_revenue - Q1_revenue
@@ -76,10 +67,8 @@ st.header("3. Data Encoding")
 
 def encode_categorical_data(df):
     """Encode categorical variables for machine learning"""
-    # Economic interpretation: Converting categorical business data (regions, segments) into numerical format enables quantitative analysis of market patterns
     df_encoded = df.copy()
     
-    # Label encoding for categorical variables
     le_region = LabelEncoder()
     le_category = LabelEncoder()
     le_segment = LabelEncoder()
@@ -104,7 +93,6 @@ st.header("4. Data Scaling")
 
 def scale_numerical_data(df_encoded):
     """Scale numerical variables for analysis"""
-    # Economic interpretation: Scaling ensures that revenue and unit sales are on comparable scales for fair analysis across different business metrics
     scaler = StandardScaler()
     
     numerical_cols = ['Sales Revenue (USD)', 'Units Sold', 'Market Share (%)']
@@ -130,19 +118,15 @@ st.header("5. Statistical Analysis and Aggregation")
 
 def statistical_analysis(df):
     """Perform statistical analysis and aggregation"""
-    # Economic interpretation: Aggregated statistics reveal which regions, products, and customer segments drive the highest revenue and market share for NVIDIA
     
-    # Revenue by region
     revenue_by_region = df.groupby('Region')['Sales Revenue (USD)'].agg(['sum', 'mean', 'count']).round(2)
     st.subheader("Revenue Analysis by Region")
     st.write(revenue_by_region)
     
-    # Revenue by product category
     revenue_by_category = df.groupby('Product Category')['Sales Revenue (USD)'].agg(['sum', 'mean', 'count']).round(2)
     st.subheader("Revenue Analysis by Product Category")
     st.write(revenue_by_category)
     
-    # Market share by customer segment
     market_share_by_segment = df.groupby('Customer Segment')['Market Share (%)'].agg(['mean', 'max', 'min']).round(2)
     st.subheader("Market Share by Customer Segment")
     st.write(market_share_by_segment)
@@ -156,9 +140,7 @@ st.header("6. Data Merging and Joining")
 
 def merge_data_analysis(df):
     """Create summary tables and merge with main data"""
-    # Economic interpretation: Merging aggregated performance metrics with detailed sales data provides comprehensive view of business performance patterns
     
-    # Create summary by region
     region_summary = df.groupby('Region').agg({
         'Sales Revenue (USD)': 'sum',
         'Units Sold': 'sum',
@@ -167,7 +149,6 @@ def merge_data_analysis(df):
     region_summary.columns = ['Total_Revenue', 'Total_Units', 'Avg_Market_Share']
     region_summary = region_summary.reset_index()
     
-    # Merge back with original data
     df_merged = df.merge(region_summary, on='Region', how='left')
     
     st.write("Data merged with regional performance summaries")
@@ -183,23 +164,19 @@ st.header("7. Data Visualization")
 
 def create_visualizations(df):
     """Create various visualizations of the data"""
-    # Economic interpretation: Visual analysis reveals sales trends, regional performance differences, and product category contributions to NVIDIA's business
     
     fig, axes = plt.subplots(2, 2, figsize=(15, 10))
     
-    # Revenue by region
     revenue_by_region = df.groupby('Region')['Sales Revenue (USD)'].sum()
     axes[0,0].bar(revenue_by_region.index, revenue_by_region.values)
     axes[0,0].set_title('Total Revenue by Region')
     axes[0,0].set_ylabel('Revenue (USD)')
     axes[0,0].tick_params(axis='x', rotation=45)
     
-    # Revenue by product category
     revenue_by_category = df.groupby('Product Category')['Sales Revenue (USD)'].sum()
     axes[0,1].pie(revenue_by_category.values, labels=revenue_by_category.index, autopct='%1.1f%%')
     axes[0,1].set_title('Revenue Distribution by Product Category')
     
-    # Units sold over time (monthly)
     df['Month'] = df['Date'].dt.to_period('M')
     monthly_units = df.groupby('Month')['Units Sold'].sum()
     axes[1,0].plot(monthly_units.index.astype(str), monthly_units.values)
@@ -207,7 +184,6 @@ def create_visualizations(df):
     axes[1,0].set_ylabel('Units Sold')
     axes[1,0].tick_params(axis='x', rotation=45)
     
-    # Market share by customer segment
     market_share_by_segment = df.groupby('Customer Segment')['Market Share (%)'].mean()
     axes[1,1].bar(market_share_by_segment.index, market_share_by_segment.values)
     axes[1,1].set_title('Average Market Share by Customer Segment')
@@ -224,20 +200,16 @@ st.header("8. Customer Segmentation Analysis (Clustering)")
 
 def perform_clustering(df_scaled):
     """Perform K-means clustering on customer data"""
-    # Economic interpretation: Clustering identifies distinct customer groups based on purchasing patterns, helping NVIDIA target different market segments effectively
     
-    # Select features for clustering
     features = ['Revenue_scaled', 'Units_scaled', 'MarketShare_scaled', 'Region_encoded', 'Customer_Segment_encoded']
     X = df_scaled[features]
     
-    # Handle missing values by dropping rows with NaN
     X_clean = X.dropna()
     df_clean = df_scaled.loc[X_clean.index].copy()
     
     st.write(f"Removed {len(df_scaled) - len(X_clean)} rows with missing values for clustering")
     st.write(f"Using {len(X_clean)} records for clustering analysis")
     
-    # Perform K-means clustering
     kmeans = KMeans(n_clusters=4, random_state=42)
     clusters = kmeans.fit_predict(X_clean)
     
@@ -246,7 +218,6 @@ def perform_clustering(df_scaled):
     
     st.write("K-means clustering performed with 4 clusters")
     
-    # Analyze clusters
     cluster_analysis = df_clustered.groupby('Cluster').agg({
         'Sales Revenue (USD)': 'mean',
         'Units Sold': 'mean',
@@ -256,7 +227,6 @@ def perform_clustering(df_scaled):
     st.write("Cluster characteristics:")
     st.write(cluster_analysis)
     
-    # Visualize clusters
     fig, ax = plt.subplots(figsize=(10, 6))
     scatter = ax.scatter(df_clustered['Sales Revenue (USD)'], df_clustered['Units Sold'], 
                         c=df_clustered['Cluster'], cmap='viridis', alpha=0.6)
@@ -275,14 +245,11 @@ st.header("9. Customer Type Prediction (Logistic Regression)")
 
 def logistic_regression_analysis(df_encoded):
     """Predict customer type using logistic regression"""
-    # Economic interpretation: Predicting customer type (Business vs Individual) helps NVIDIA optimize sales strategies and resource allocation for different market segments
     
-    # Prepare features and target
     features = ['Sales Revenue (USD)', 'Units Sold', 'Market Share (%)', 'Region_encoded', 'Product_Category_encoded']
     X = df_encoded[features]
     y = df_encoded['Customer_Type_encoded']  # 0: Business, 1: Individual
     
-    # Handle missing values by dropping rows with NaN
     data_clean = df_encoded[features + ['Customer_Type_encoded']].dropna()
     X_clean = data_clean[features]
     y_clean = data_clean['Customer_Type_encoded']
@@ -290,14 +257,11 @@ def logistic_regression_analysis(df_encoded):
     st.write(f"Removed {len(df_encoded) - len(data_clean)} rows with missing values for logistic regression")
     st.write(f"Using {len(data_clean)} records for model training")
     
-    # Split data
     X_train, X_test, y_train, y_test = train_test_split(X_clean, y_clean, test_size=0.3, random_state=42)
     
-    # Train logistic regression
     log_reg = LogisticRegression(random_state=42)
     log_reg.fit(X_train, y_train)
     
-    # Predictions
     y_pred = log_reg.predict(X_test)
     accuracy = accuracy_score(y_test, y_pred)
     
@@ -320,14 +284,11 @@ st.header("10. Revenue Prediction (Multiple Regression)")
 
 def multiple_regression_analysis(df_encoded):
     """Perform multiple regression to predict sales revenue"""
-    # Economic interpretation: Multiple regression identifies key factors driving NVIDIA's sales revenue, enabling better forecasting and strategic planning
     
-    # Prepare variables
     features = ['Units Sold', 'Market Share (%)', 'Region_encoded', 'Product_Category_encoded', 'Customer_Segment_encoded']
     X = df_encoded[features]
     y = df_encoded['Sales Revenue (USD)']
     
-    # Handle missing values by dropping rows with NaN
     data_clean = df_encoded[features + ['Sales Revenue (USD)']].dropna()
     X_clean = data_clean[features]
     y_clean = data_clean['Sales Revenue (USD)']
@@ -335,16 +296,13 @@ def multiple_regression_analysis(df_encoded):
     st.write(f"Removed {len(df_encoded) - len(data_clean)} rows with missing values for multiple regression")
     st.write(f"Using {len(data_clean)} records for model fitting")
     
-    # Add constant for intercept
     X_clean = sm.add_constant(X_clean)
     
-    # Fit regression model
     model = sm.OLS(y_clean, X_clean).fit()
     
     st.write("Multiple Regression Results:")
     st.text(str(model.summary()))
     
-    # Key metrics
     st.write(f"R-squared: {model.rsquared:.3f}")
     st.write(f"Adjusted R-squared: {model.rsquared_adj:.3f}")
     st.write(f"F-statistic p-value: {model.f_pvalue:.6f}")
@@ -357,10 +315,8 @@ regression_model = multiple_regression_analysis(df_encoded)
 st.header("11. Geographic Analysis")
 
 def geographic_analysis(df):
-    """Analyze sales performance by geographic regions"""
-    # Economic interpretation: Geographic analysis reveals regional market penetration and helps identify expansion opportunities for NVIDIA's global business
+    """Analyze sales performance by geographic regions using Geopandas."""
     
-    # Regional performance summary
     regional_performance = df.groupby('Region').agg({
         'Sales Revenue (USD)': ['sum', 'mean'],
         'Units Sold': 'sum',
@@ -373,29 +329,92 @@ def geographic_analysis(df):
     st.write("Regional Performance Summary:")
     st.write(regional_performance)
     
-    # Simple bar chart for regional comparison
-    fig, ax = plt.subplots(figsize=(12, 6))
-    x_pos = range(len(regional_performance))
-    ax.bar(x_pos, regional_performance['Total_Revenue'], alpha=0.7)
-    ax.set_xlabel('Region')
-    ax.set_ylabel('Total Revenue (USD)')
-    ax.set_title('Total Revenue by Geographic Region')
-    ax.set_xticks(x_pos)
-    ax.set_xticklabels(regional_performance['Region'], rotation=45)
-    
-    # Add value labels on bars
-    for i, v in enumerate(regional_performance['Total_Revenue']):
-        ax.text(i, v + max(regional_performance['Total_Revenue'])*0.01, f'${v:,.0f}', 
-                ha='center', va='bottom')
-    
-    plt.tight_layout()
-    st.pyplot(fig)
-    
+    # --- Geopandas Map Visualization ---
+    try:
+        # Ensure you have pyogrio installed: pip install pyogrio
+        world = gpd.read_file(gpd.datasets.get_path('naturalearth_lowres'), engine="pyogrio")
+        # Filter out Antarctica and French Southern and Antarctic Lands as they are not typical sales regions
+        world = world[~world['name'].isin(['Antarctica', 'Fr. S. Antarctic Lands'])]
+
+        # Define NVIDIA's sales regions based on continents and specific country lists
+        # This mapping is an approximation. Ensure country names match those in naturalearth_lowres.
+        middle_east_countries_map = {
+            'Israel', 'Jordan', 'Lebanon', 'Syrian Arab Rep.', 'Iraq',
+            'Iran (Islamic Rep. of)', 'Saudi Arabia', 'Yemen', 'Oman', 'United Arab Emirates',
+            'Qatar', 'Bahrain', 'Kuwait', 'Turkey', 'Cyprus', 'Egypt', 'Palestine'
+        }
+
+        def assign_nvidia_region(row):
+            country_name = row['name']
+            continent = row['continent']
+
+            if country_name in middle_east_countries_map:
+                return 'Middle East'
+            
+            if continent == 'North America':
+                return 'North America'
+            elif continent == 'South America':
+                return 'South America'
+            elif continent == 'Europe':
+                return 'Europe'
+            elif continent == 'Africa':
+                return 'Africa'
+            elif continent == 'Asia': # Countries in Asia not in Middle East
+                return 'APAC'
+            elif continent == 'Oceania': # Australia, New Zealand, etc.
+                return 'APAC'
+            return 'Other' # Should catch any unmapped areas
+
+        world['NVIDIA_Region'] = world.apply(assign_nvidia_region, axis=1)
+        
+        # Dissolve countries into NVIDIA regions.
+        # Select only necessary columns before dissolving to avoid warnings with non-numeric data.
+        world_regions = world[['NVIDIA_Region', 'geometry']].dissolve(by='NVIDIA_Region', aggfunc='first')
+
+        # Merge with sales data
+        # world_regions will have NVIDIA_Region as its index after dissolve
+        merged_map_data = world_regions.merge(regional_performance, left_index=True, right_on='Region', how='left')
+        
+        # Fill NaN for regions on map that might not have sales data (e.g., 'Other')
+        merged_map_data['Total_Revenue'] = merged_map_data['Total_Revenue'].fillna(0)
+
+        # Plotting
+        fig_map, ax_map = plt.subplots(1, 1, figsize=(17, 10)) # Increased figure size slightly
+        merged_map_data.plot(column='Total_Revenue', 
+                             ax=ax_map, 
+                             legend=True,
+                             legend_kwds={'label': "Total Revenue (USD) by NVIDIA Region", 'orientation': "horizontal", "shrink": 0.5},
+                             cmap='viridis',
+                             missing_kwds={"color": "lightgrey", "edgecolor": "red", "hatch": "///", "label": "No Sales Data"})
+
+        ax_map.set_title('Total Revenue by NVIDIA Sales Region', fontsize=15)
+        ax_map.set_axis_off()
+        
+        plt.tight_layout()
+        st.pyplot(fig_map)
+        
+    except Exception as e:
+        st.error(f"Could not generate map: {e}")
+        st.write("Displaying regional performance as a bar chart instead:")
+        # Fallback to bar chart if map generation fails
+        fig_bar, ax_bar = plt.subplots(figsize=(12, 6))
+        x_pos = range(len(regional_performance))
+        ax_bar.bar(x_pos, regional_performance['Total_Revenue'], alpha=0.7)
+        ax_bar.set_xlabel('Region')
+        ax_bar.set_ylabel('Total Revenue (USD)')
+        ax_bar.set_title('Total Revenue by Geographic Region (Fallback)')
+        ax_bar.set_xticks(x_pos)
+        ax_bar.set_xticklabels(regional_performance['Region'], rotation=45)
+        for i, v in enumerate(regional_performance['Total_Revenue']):
+            ax_bar.text(i, v + max(regional_performance['Total_Revenue'])*0.01, f'${v:,.0f}', 
+                    ha='center', va='bottom')
+        plt.tight_layout()
+        st.pyplot(fig_bar)
+
     return regional_performance
 
 regional_performance = geographic_analysis(df)
 
-# Summary and Conclusions
 st.header("12. Summary and Business Insights")
 st.write("""
 **Economic Interpretation of Key Findings:**
@@ -415,7 +434,6 @@ st.write("""
 These insights support strategic decision-making for market expansion, product development, and customer targeting.
 """)
 
-# Display final metrics
 col1, col2, col3, col4 = st.columns(4)
 with col1:
     st.metric("Total Revenue", f"${df['Sales Revenue (USD)'].sum():,.0f}")
@@ -424,4 +442,4 @@ with col2:
 with col3:
     st.metric("Average Market Share", f"{df['Market Share (%)'].mean():.1f}%")
 with col4:
-    st.metric("Number of Regions", df['Region'].nunique()) 
+    st.metric("Number of Regions", df['Region'].nunique())
